@@ -1,0 +1,398 @@
+
+C:\Users\Bhanu Sri>mongosh
+Current Mongosh Log ID: 6a2fa16895fce5ff98abc113
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.8.3
+Using MongoDB:          8.3.2
+Using Mongosh:          2.8.3
+
+For mongosh info see: https://www.mongodb.com/docs/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2026-06-15T10:07:12.277+05:30: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+------
+--creating the db
+test> use expense_tracker
+switched to db expense_tracker
+--checking the connection
+expense_tracker> show collections
+expenses
+--Shows the values in the expenses collections 
+expense_tracker> db.expenses.find()
+[
+  {
+    _id: ObjectId('6a2f93354e322af0beabc114'),
+    title: 'Movie',
+    amount: 500,
+    category: 'Entertainment',
+    date: '2026-06-13',
+    payment_method: 'Card'
+  },
+  {
+    _id: ObjectId('6a2f9560a651dad007abc115'),
+    title: 'pizza',
+    amount: 250,
+    category: 'food',
+    date: '2026-06-14',
+    payment_method: 'upi'
+  },
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 4000,
+    location: { city: 'hyd', state: 'telangana' }
+  }
+]
+---inserting the value using keyword,insertOne
+expense_tracker> db.expenses.insertOne({title:'metro ticket',
+| amount:100,category:'travel',date:'2026-06-15'})
+{
+  acknowledged: true,
+  insertedId: ObjectId('6a2fa1e895fce5ff98abc114')
+}
+--updating the or adding the new value using set keyword
+expense_tracker> db.expenses.updateOne({title:'electricity bill'},{$set:{category:'daily usage'}});
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+--fnding the value using the attributes
+expense_tracker> db.expenses.find({title:'electricity bill'})
+[
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 4000,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  }
+]
+--finding the amount is greater then 100
+expense_tracker> db.expenses.find({amount:{$gt:100}})
+[
+  {
+    _id: ObjectId('6a2f93354e322af0beabc114'),
+    title: 'Movie',
+    amount: 500,
+    category: 'Entertainment',
+    date: '2026-06-13',
+    payment_method: 'Card'
+  },
+  {
+    _id: ObjectId('6a2f9560a651dad007abc115'),
+    title: 'pizza',
+    amount: 250,
+    category: 'food',
+    date: '2026-06-14',
+    payment_method: 'upi'
+  },
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 4000,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  }
+]
+--updating value of price of pizza using the $increment
+expense_tracker> db.expenses.updateOne({
+| title:'pizza'},{$inc:{amount:20}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+expense_tracker> db.expenses.find({title:'pizza'})
+[
+  {
+    _id: ObjectId('6a2f9560a651dad007abc115'),
+    title: 'pizza',
+    amount: 270,
+    category: 'food',
+    date: '2026-06-14',
+    payment_method: 'upi'
+  }
+]
+--updating the price ,giving the discount to electricity bill 10%
+expense_tracker> db.expenses.updateMany(
+| { category: 'daily usage' },
+| { $mul: { amount: 0.90 } }    // multiply price by 0.90 = 10% off
+| );
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+expense_tracker> db.expenses.find({title:'electricty bill'})
+
+expense_tracker> db.expenses.find({title:'electricty bill'})
+
+expense_tracker> db.expenses.find()
+[
+  {
+    _id: ObjectId('6a2f93354e322af0beabc114'),
+    title: 'Movie',
+    amount: 500,
+    category: 'Entertainment',
+    date: '2026-06-13',
+    payment_method: 'Card'
+  },
+  {
+    _id: ObjectId('6a2f9560a651dad007abc115'),
+    title: 'pizza',
+    amount: 270,
+    category: 'food',
+    date: '2026-06-14',
+    payment_method: 'upi'
+  },
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 3600,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  },
+  {
+    _id: ObjectId('6a2fa1e895fce5ff98abc114'),
+    title: 'metro ticket',
+    amount: 100,
+    category: 'travel',
+    date: '2026-06-15'
+  }
+]
+--delete operations
+--using deleteOne
+expense_tracker> db.expenses.deleteOne({title:'Movie'})
+{ acknowledged: true, deletedCount: 1 }
+expense_tracker> db.expenses.find()
+[
+  {
+    _id: ObjectId('6a2f9560a651dad007abc115'),
+    title: 'pizza',
+    amount: 270,
+    category: 'food',
+    date: '2026-06-14',
+    payment_method: 'upi'
+  },
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 3600,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  },
+  {
+    _id: ObjectId('6a2fa1e895fce5ff98abc114'),
+    title: 'metro ticket',
+    amount: 100,
+    category: 'travel',
+    date: '2026-06-15'
+  }
+]
+-- deleting many with has same attribute
+expense_tracker> db.expenses.deleteMany({amount:270})
+{ acknowledged: true, deletedCount: 2 }
+expense_tracker> db.expenses.find()
+[
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 3600,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  }
+]
+--finding expenses greather then 250
+expense_tracker> db.expenses.find({ amount: { $gt: 1000 } });
+[
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 3600,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  }
+]
+expense_tracker> db.expenses.find({ amount: { $gt: 250 } });
+[
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 3600,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  }
+]
+--filters amount between 100to1000
+expense_tracker> db.expenses.find(
+| {
+|     amount:{
+|         $gte:150,
+|         $lte:1000
+|     }
+| }
+| )
+[
+  {
+    _id: ObjectId('6a3017004904af1faaabc114'),
+    title: 'petrol',
+    amount: 200,
+    category: 'travel',
+    date: '2026-06-13',
+    payment_method: 'cash'
+  },
+  {
+    _id: ObjectId('6a30170c4904af1faaabc115'),
+    title: 'pizza',
+    amount: 250,
+    category: 'food',
+    date: '2026-06-14',
+    payment_method: 'upi'
+  }
+]
+--sorting in aesc(1)
+expense_tracker> db.expenses.find().sort(
+|     {amount:1}
+| )
+[
+  {
+    _id: ObjectId('6a3017004904af1faaabc114'),
+    title: 'petrol',
+    amount: 200,
+    category: 'travel',
+    date: '2026-06-13',
+    payment_method: 'cash'
+  },
+  {
+    _id: ObjectId('6a30170c4904af1faaabc115'),
+    title: 'pizza',
+    amount: 250,
+    category: 'food',
+    date: '2026-06-14',
+    payment_method: 'upi'
+  },
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 3600,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  }
+]
+--In desc(-1)
+expense_tracker> db.expenses.find().sort(
+|     {amount:-1}
+| )
+[
+  {
+    _id: ObjectId('6a2f9f1aa651dad007abc116'),
+    title: 'electricity bill',
+    amount: 3600,
+    location: { city: 'hyd', state: 'telangana' },
+    category: 'daily usage'
+  },
+  {
+    _id: ObjectId('6a30170c4904af1faaabc115'),
+    title: 'pizza',
+    amount: 250,
+    category: 'food',
+    date: '2026-06-14',
+    payment_method: 'upi'
+  },
+  {
+    _id: ObjectId('6a3017004904af1faaabc114'),
+    title: 'petrol',
+    amount: 200,
+    category: 'travel',
+    date: '2026-06-13',
+    payment_method: 'cash'
+  }
+]
+--aggregrate functions
+expense_tracker> db.expenses.aggregate([
+| {
+|     $group:{
+|         _id:null,
+|         totalExpense:{
+|             $sum:"$amount"
+|         }
+|     }
+| }
+| ])
+[ { _id: null, totalExpense: 4050 } ]
+--avg expenses
+[ { _id: null, totalExpense: 4050 } ]
+expense_tracker> db.expenses.aggregate([
+| {
+|     $group:{
+|         _id:null,
+|         averageExpense:{
+|             $avg:"$amount"
+|         }
+|     }
+| }
+| ])
+[ { _id: null, averageExpense: 1350 } ]
+--highest expense
+expense_tracker> db.expenses.aggregate([
+| {
+|     $group:{
+|         _id:null,
+|         maxExpense:{
+|             $max:"$amount"
+|         }
+|     }
+| }
+| ])
+[ { _id: null, maxExpense: 3600 } ]
+--nested expenses
+expense_tracker> db.expenses.insertOne({
+|     title: "Groceries",
+|     amount: 2500,
+|     category: "Food",
+|
+|     vendor: {
+|         name: "D-Mart",
+|         contact: "9876543210",
+|         city: "Hyderabad"
+|     }
+| })
+{
+  acknowledged: true,
+  insertedId: ObjectId('6a302a594904af1faaabc116')
+}
+expense_tracker> db.expenses.find({
+|     "vendor.name": "D-Mart"
+| })
+[
+  {
+    _id: ObjectId('6a302a594904af1faaabc116'),
+    title: 'Groceries',
+    amount: 2500,
+    category: 'Food',
+    vendor: { name: 'D-Mart', contact: '9876543210', city: 'Hyderabad' }
+  }
+]
+--updating the nested 
+expense_tracker> db.expenses.updateOne(
+|     { title: "pizza" },
+|     {
+|         $set: {
+|             "amount":500
+|         }
+|     }
+| )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
