@@ -1,0 +1,268 @@
+--creating database
+test> use hospital_mangement
+switched to db hospital_mangement
+--inserting values in collections
+hospital_mangement> db.patients.insertOne({
+|     patient_id: 101,
+|     name: "Rahul",
+|     age: 25,
+|     gender: "Male",
+|     city: "Hyderabad"
+| })
+{
+  acknowledged: true,
+  insertedId: ObjectId('6a33e2854c9aa0ee55abc114')
+}
+--inserting many values
+hospital_mangement> db.patients.insertMany([
+| {
+|     patient_id: 102,
+|     name: "Priya",
+|     age: 30,
+|     gender: "Female",
+|     city: "Mumbai"
+| },
+| {
+|     patient_id: 103,
+|     name: "Arjun",
+|     age: 40,
+|     gender: "Male",
+|     city: "Hyderabad"
+| },
+| {
+|     patient_id: 104,
+|     name: "rohan",
+|     age: 28,
+|     gender: "male",
+|     city: "Chennai"
+| }
+| ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6a33e2ab4c9aa0ee55abc115'),
+    '1': ObjectId('6a33e2ab4c9aa0ee55abc116'),
+    '2': ObjectId('6a33e2ab4c9aa0ee55abc117')
+  }
+}
+--inserting values in appointments collections
+hospital_mangement> db.appointments.insertMany([
+| {
+|     appointment_id: 1,
+|     patient_id: 101,
+|     doctor: "Dr. Sharma",
+|     date: "2026-06-15"
+| },
+| {
+|     appointment_id: 2,
+|     patient_id: 102,
+|     doctor: "Dr. Reddy",
+|     date: "2026-06-16"
+| },
+| {
+|     appointment_id: 3,
+|     patient_id: 103,
+|     doctor: "Dr. raju",
+|     date: "2026-06-17"
+| }
+| ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6a33e2cb4c9aa0ee55abc118'),
+    '1': ObjectId('6a33e2cb4c9aa0ee55abc119'),
+    '2': ObjectId('6a33e2cb4c9aa0ee55abc11a')
+  }
+}
+--
+hospital_mangement> db.appointments.insertOne(
+| {
+|     appointment_id: 4,
+|     patient_id: 102,
+|     doctor: "Dr. Sharma",
+|     date: "2026-06-15"
+| })
+{
+  acknowledged: true,
+  insertedId: ObjectId('6a33e31c4c9aa0ee55abc11b')
+}
+--showing collections
+hospital_mangement> show collections
+appointments
+patients
+--using the find()
+hospital_mangement> db.appointments.find()
+[
+  {
+    _id: ObjectId('6a33e2cb4c9aa0ee55abc118'),
+    appointment_id: 1,
+    patient_id: 101,
+    doctor: 'Dr. Sharma',
+    date: '2026-06-15'
+  },
+  {
+    _id: ObjectId('6a33e2cb4c9aa0ee55abc119'),
+    appointment_id: 2,
+    patient_id: 102,
+    doctor: 'Dr. Reddy',
+    date: '2026-06-16'
+  },
+  {
+    _id: ObjectId('6a33e2cb4c9aa0ee55abc11a'),
+    appointment_id: 3,
+    patient_id: 103,
+    doctor: 'Dr. raju',
+    date: '2026-06-17'
+  },
+  {
+    _id: ObjectId('6a33e31c4c9aa0ee55abc11b'),
+    appointment_id: 4,
+    patient_id: 102,
+    doctor: 'Dr. Sharma',
+    date: '2026-06-15'
+  }
+]
+hospital_mangement> db.patients.find()
+[
+  {
+    _id: ObjectId('6a33e2854c9aa0ee55abc114'),
+    patient_id: 101,
+    name: 'Rahul',
+    age: 25,
+    gender: 'Male',
+    city: 'Hyderabad'
+  },
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc115'),
+    patient_id: 102,
+    name: 'Priya',
+    age: 30,
+    gender: 'Female',
+    city: 'Mumbai'
+  },
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc116'),
+    patient_id: 103,
+    name: 'Arjun',
+    age: 40,
+    gender: 'Male',
+    city: 'Hyderabad'
+  },
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc117'),
+    patient_id: 104,
+    name: 'rohan',
+    age: 28,
+    gender: 'male',
+    city: 'Chennai'
+  }
+]
+--Updating the values using updateOne()
+hospital_mangement> db.patients.updateOne({patient_id:104},{$set:{age:30}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+--finding using attribute
+hospital_mangement> db.patients.find({city:'Chennai'})
+[
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc117'),
+    patient_id: 104,
+    name: 'rohan',
+    age: 30,
+    gender: 'male',
+    city: 'Chennai'
+  }
+]
+--deleting values from collections
+hospital_mangement> db.appointment.deleteOne({appointment_id:3})
+{ acknowledged: true, deletedCount: 0 }
+--aggeregate functions
+hospital_mangement> db.patients.aggregate([
+| {
+|     $group:{
+|         _id:"$city",
+|         total_patients:{$sum:1}
+|     }
+| }
+| ])
+[
+  { _id: 'Mumbai', total_patients: 1 },
+  { _id: 'Hyderabad', total_patients: 2 },
+  { _id: 'Chennai', total_patients: 1 }
+]
+--queries using finding
+hospital_mangement> db.patients.find({gender:"Female"})
+[
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc115'),
+    patient_id: 102,
+    name: 'Priya',
+    age: 30,
+    gender: 'Female',
+    city: 'Mumbai'
+  }
+]
+hospital_mangement> db.patients.find({gender:"male"})
+[
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc117'),
+    patient_id: 104,
+    name: 'rohan',
+    age: 30,
+    gender: 'male',
+    city: 'Chennai'
+  }
+]
+--sorting the values with age
+hospital_mangement> db.patients.find().sort({age:1})
+[
+  {
+    _id: ObjectId('6a33e2854c9aa0ee55abc114'),
+    patient_id: 101,
+    name: 'Rahul',
+    age: 25,
+    gender: 'Male',
+    city: 'Hyderabad'
+  },
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc115'),
+    patient_id: 102,
+    name: 'Priya',
+    age: 30,
+    gender: 'Female',
+    city: 'Mumbai'
+  },
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc117'),
+    patient_id: 104,
+    name: 'rohan',
+    age: 30,
+    gender: 'male',
+    city: 'Chennai'
+  },
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc116'),
+    patient_id: 103,
+    name: 'Arjun',
+    age: 40,
+    gender: 'Male',
+    city: 'Hyderabad'
+  }
+]
+--finding greater then 30 age
+hospital_mangement> db.patients.find({age:{$gt:30}})
+[
+  {
+    _id: ObjectId('6a33e2ab4c9aa0ee55abc116'),
+    patient_id: 103,
+    name: 'Arjun',
+    age: 40,
+    gender: 'Male',
+    city: 'Hyderabad'
+  }
+]
